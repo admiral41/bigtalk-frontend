@@ -1,0 +1,14 @@
+.dashboard-profile{
+    width: 70%;
+}
+.btnss{
+    border-radius: 10px;
+    height:40px;
+    color: white;
+    border: 1px solid white;
+    background-color: transparent;
+}
+.btnss:hover{
+    background-color: #3b3b3b;
+    color: white;
+}
