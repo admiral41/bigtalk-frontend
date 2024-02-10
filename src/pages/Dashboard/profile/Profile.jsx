@@ -1,24 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Profile.css";
 const Profile = () => {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    // Retrieve user data from local storage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setUser(storedUser);
+  }, []);
+
+  if (!user) {
+    return null; // Render nothing if user data is not available yet
+  }
+  const getInitials = (name) => {
+    const words = name.split(" ");
+    if (words.length === 1) {
+      return words[0].slice(0, 2).toUpperCase();
+    } else {
+      return words.map((word) => word[0]).join("").toUpperCase();
+    }
+  };
+  const { name, username, following, followers } = user;
+
   return (
     <>
       <div className="text-light w-100 d-flex justify-content-center pt-3">
         <div className="dashboard-profile">
           <div className=" d-flex justify-content-between">
             <div className="name">
-              <h3 style={{ fontSize: "1.6rem" }}>Full Name</h3>
-              <hp style={{ fontSize: "1.2rem" }}>user name</hp>
+            <h3 style={{ fontSize: "1.6rem" }}>{name}</h3>
+            <p style={{ color: "gray", fontSize: "1.2rem" }}>{username}</p>
             </div>
-            <img
-              src="/assets/icons/p.png"
-              alt="User Avatar"
-              style={{ height: "90px", width: "90px", borderRadius: "50%" }}
-            />
+
+              {user.avatar && isValidURL(user.avatar.url) ? (
+                <img
+                  src={user.avatar.url}
+                  alt="User Avatar"
+                  className="avatar-img"
+                  style={{ height: "90px", width: "90px", borderRadius: "50%" }}
+                />
+              ) : (
+                <div className="avatar-placeholder"  style={{ height: "90px", width: "90px", borderRadius: "50%" }}> 
+                  <p className="fw-bold">{getInitials(user.name)}</p>
+                </div>
+              )}
+           
           </div>
           <p style={{ color: "gray" }} className="pt-3">
-            0 Follower
-          </p>
+          {followers.length} Follower{followers.length !== 1 && "s"} |{" "}
+          {following.length} Following
+        </p>
           <div className="bottons d-flex justify-content-between">
             <button
               type="button"
@@ -73,3 +103,12 @@ const Profile = () => {
 };
 
 export default Profile;
+
+function isValidURL(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}

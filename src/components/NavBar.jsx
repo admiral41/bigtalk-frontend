@@ -40,7 +40,7 @@ const Navbar = () => {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
-                      Welcome {user.name}
+                      Welcome, {user.username}
                     </button>
                     <ul className="dropdown-menu">
                       <li>

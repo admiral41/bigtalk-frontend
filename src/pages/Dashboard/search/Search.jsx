@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Search.css";
-import { searchUserApi } from "../../../apis/Api";
+import { searchUserApi, followUserApi } from "../../../apis/Api";
+import { toast } from "react-toastify";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,9 +23,18 @@ const Search = () => {
     try {
       const response = await searchUserApi({ name: searchTerm });
       const users = response.data.users;
-
-      setSearchResults(users || []);
-      setSearchMessage(users && users.length === 0 ? "User not found" : "");
+  
+      // Get the ID of the logged-in user from localStorage
+      const loggedInUserId = JSON.parse(localStorage.getItem("user"))._id;
+  
+      // Set the isFollowing property based on the user's follow status
+      const updatedUsers = users.map((user) => ({
+        ...user,
+        isFollowing: user._id !== loggedInUserId && loggedInUserId && user.followers.includes(loggedInUserId),
+      }));
+  
+      setSearchResults(updatedUsers || []);
+      setSearchMessage(updatedUsers && updatedUsers.length === 0 ? "User not found" : "");
     } catch (error) {
       console.error("Error searching users:", error.message);
       if (error.response) {
@@ -36,6 +46,31 @@ const Search = () => {
       setIsLoading(false);
     }
   };
+  
+  const handleFollow = async (userId, isFollowing) => {
+    try {
+      // Send a follow/unfollow request to the server
+      await followUserApi(userId);
+  
+      // Update the local state to reflect the change
+      setSearchResults((prevResults) =>
+        prevResults.map((user) =>
+          user._id === userId ? { ...user, isFollowing: !isFollowing } : user
+        )
+      );
+  
+      // Update the user data in localStorage
+      const updatedUser = JSON.parse(localStorage.getItem("user"));
+      updatedUser.following = isFollowing ? updatedUser.following.filter(id => id !== userId) : [...updatedUser.following, userId];
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+     
+      toast.success(isFollowing ? "Unfollowed successfully" : "Followed successfully");
+    } catch (error) {
+      console.error("Error following/unfollowing user:", error.message);
+      // Handle error if needed
+    }
+  };
+  
 
   useEffect(() => {
     const performSearch = async () => {
@@ -49,6 +84,9 @@ const Search = () => {
 
     performSearch();
   }, [searchTerm]);
+
+  // Get the ID of the logged-in user from localStorage
+  const loggedInUserId = JSON.parse(localStorage.getItem("user"))._id;
 
   return (
     <div className="search-container text-light">
@@ -90,10 +128,21 @@ const Search = () => {
             </div>
             <div className="search-result-details">
               <h5>{user.name}</h5>
-              <p>{user.email}</p>
+              <p>{user.username}</p>
             </div>
             <div className="follow-button">
-              <button className="follows btn px-4">Follow</button>
+              {user._id === loggedInUserId ? (
+                <button className="follows btn px-4">
+                  View Profile
+                </button>
+              ) : (
+                <button
+                  className={`follows btn px-4 ${user.isFollowing ? "unfollow" : "follow"}`}
+                  onClick={() => handleFollow(user._id, user.isFollowing)}
+                >
+                  {user.isFollowing ? "Unfollow" : "Follow"}
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -103,6 +152,8 @@ const Search = () => {
 };
 
 export default Search;
+
+
 
 function isValidURL(string) {
   try {

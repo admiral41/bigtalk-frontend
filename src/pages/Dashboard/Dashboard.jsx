@@ -6,6 +6,7 @@ import Navbar from "../../components/NavBar.jsx";
 import Search from "./search/Search.jsx";
 import Profile from "./profile/Profile.jsx";
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import Activity from "./acitivity/Activity.jsx";
 
 const Dashboard = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 900);
@@ -14,7 +15,8 @@ const Dashboard = () => {
   const handleNavClick = (item) => {
     setActiveNavItem(item);
   };
-
+  console.log(localStorage.getItem("user"));  
+  console.log(localStorage.getItem("token"));
   useEffect(() => {
    
     const handleResize = () => {
@@ -46,6 +48,7 @@ const Dashboard = () => {
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/activity/*" element={<Activity/>} />
         </Routes>
       </div>
     </div>

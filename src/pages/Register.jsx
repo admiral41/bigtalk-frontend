@@ -7,9 +7,13 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username,setUserName] = useState("");
   const handleName = (e) => {
     setName(e.target.value);
   };
+  const handleUserName = (e) => {
+    setUserName(e.target.value);
+  }
   const handleEmail = (e) => {
     setEmail(e.target.value);
   };
@@ -26,6 +30,7 @@ const Register = () => {
 
     const data = {
       name: name,
+      username:username,
       email: email,
       password: password,
     };
@@ -72,6 +77,19 @@ const Register = () => {
                     type="text"
                     className="form-control"
                     id="fullName"
+                    placeholder="Enter your full name"
+                    style={{ color: 'black' }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="username" className="form-label">
+                    Username
+                  </label>
+                  <input
+                    onChange={handleUserName}
+                    type="text"
+                    className="form-control"
+                    id="username"
                     placeholder="Enter your full name"
                     style={{ color: 'black' }}
                   />
